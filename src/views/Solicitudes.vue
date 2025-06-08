@@ -1,6 +1,13 @@
 <template>
-  <div class="p-6">
-    <h1 class="text-2xl font-bold">Gestión de Incidentes</h1>
-    <p>Próximamente...</p>
+  <div>
+    <h1>Gestión de Solicitudes</h1>
+    <p>En este módulo puedes enviar solicitudes de soporte o recursos.</p>
+
+    <!-- Mostrar el formulario de solicitud -->
+    <RequestCard />
   </div>
 </template>
+
+<script setup>
+import RequestCard from '../components/RequestCard.vue'
+</script>

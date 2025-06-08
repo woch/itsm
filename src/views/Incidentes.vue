@@ -1,6 +1,13 @@
 <template>
-  <div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">Gestión de Incidentes</h1>
+  <div>
+    <h1>Gestión de Incidentes</h1>
     <p>Este módulo te permite reportar y seguir incidentes técnicos.</p>
+
+    <!-- Aquí se muestra el formulario -->
+    <IncidentCard />
   </div>
 </template>
+
+<script setup>
+import IncidentCard from '../components/IncidentCard.vue'
+</script>
