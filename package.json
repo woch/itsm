@@ -14,7 +14,10 @@
     "@vuelidate/validators": "^2.0.4",
     "autoprefixer": "^10.4.21",
     "axios": "^1.9.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
     "lucide-vue-next": "^0.513.0",
+    "mongodb": "^6.17.0",
     "postcss": "^8.5.4",
     "tailwindcss": "^4.1.8",
     "vue": "^3.5.13",
@@ -23,5 +26,18 @@
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.3",
     "vite": "^6.3.5"
-  }
+  },
+  "description": "This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.",
+  "main": "vite.config.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/woch/itsm.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/woch/itsm/issues"
+  },
+  "homepage": "https://github.com/woch/itsm#readme"
 }
