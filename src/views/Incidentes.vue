@@ -4,7 +4,7 @@
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold text-gray-800">Gestión de Incidentes</h1>
       <button @click="mostrarFormulario = !mostrarFormulario"
-        class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+        class="bg-gray-800 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-900 transition-colors">
         {{ mostrarFormulario ? 'Ver Listado' : 'Nuevo Incidente' }}
       </button>
     </div>
@@ -31,48 +31,55 @@
         No hay incidentes que coincidan con la búsqueda.
       </div>
 
-      <div v-else class="bg-white shadow-md rounded-lg overflow-x-auto">
-        <table class="min-w-full leading-normal">
-          <thead>
-            <tr>
+      <div v-else class="bg-white shadow-lg rounded-lg overflow-x-auto">
+            <table class="min-w-full">
+            <thead>
+            <tr class="bg-gray-200">
               <!-- Clases aplicadas directamente aquí -->
-              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">N°</th>
-              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Título</th>
-              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Prioridad</th>
-              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Estado</th>
-              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Fecha Creación</th>
-              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Acciones</th>
+                       <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">N°</th>
+        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Título</th> 
+        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Prioridad</th>
+        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Estado</th>
+        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Fecha Creación</th>
+        <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Acciones</th>
             </tr>
-          </thead>
-          <tbody>
-            <tr v-for="incidente in incidentes" :key="incidente._id" class="hover:bg-gray-50">
+            </thead>
+          <tbody class="divide-y divide-gray-200">
+            <tr v-for="incidente in incidentes" :key="incidente._id" class="hover:bg-gray-100 transition-colors duration-150">
               <!-- Clases aplicadas directamente aquí -->
-              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-900 font-medium">{{ incidente.numeroIncidente }}</td>
-              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-900">{{ incidente.titulo }}</td>
-              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-900">
-                <select v-model="incidente.prioridad" @change="actualizarIncidente(incidente._id, { prioridad: $event.target.value })" 
-                  :class="getPrioridadClass(incidente.prioridad)"
-                  class="w-full p-1 rounded border-none font-semibold text-xs text-center appearance-none">
-                  <option value="Baja">Baja</option>
-                  <option value="Media">Media</option>
-                  <option value="Alta">Alta</option>
-                </select>
-              </td>
-              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-900">
-                 <select v-model="incidente.estado" @change="actualizarIncidente(incidente._id, { estado: $event.target.value })" class="w-full text-xs p-1 rounded border">
-                    <option value="Abierto">Abierto</option>
-                    <option value="En Progreso">En Progreso</option>
-                    <option value="Resuelto">Resuelto</option>
-                    <option value="Cerrado">Cerrado</option>
-                </select>
-              </td>
-              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-900">{{ new Date(incidente.fechaCreacion).toLocaleDateString() }}</td>
-              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-900">
-                <router-link 
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">{{ incidente.numeroIncidente }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ incidente.titulo }}</td>
+                        
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <!-- Select de Prioridad estilizado como una píldora -->
+                            <select v-model="incidente.prioridad" @change="actualizarIncidente(incidente._id, { prioridad: $event.target.value })" 
+                            :class="getPrioridadClass(incidente.prioridad)"
+                            class="w-full text-xs font-semibold text-center rounded-full px-3 py-1 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                :class="getPrioridadClass(incidente.prioridad)"
+                                class="w-full text-xs font-semibold text-center rounded-full px-3 py-1 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <option value="Baja">Baja</option>
+                                <option value="Media">Media</option>
+                                <option value="Alta">Alta</option>
+                            </select>
+                        </td>
+             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                           <!-- Select de Estado con estilo más limpio -->
+                           <select v-model="incidente.estado" @change="actualizarIncidente(incidente._id, { estado: $event.target.value })" 
+                            class="w-full p-2 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer text-center">
+                                <option value="Abierto">Abierto</option>
+                                <option value="En Progreso">En Progreso</option>
+                                <option value="Resuelto">Resuelto</option>
+                                <option value="Cerrado">Cerrado</option>
+                           </select>
+                        </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ new Date(incidente.fechaCreacion).toLocaleDateString() }}</td>
+
+                        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                        <router-link 
                           :to="{ name: 'DetalleIncidente', params: { id: incidente._id } }"
-                          class="text-blue-600 hover:text-blue-900 font-semibold text-sm">
+                          class="bg-blue-100 text-blue-800 text-xs font-semibold py-1 px-4 rounded-full hover:bg-blue-200 transition-colors">
                           Ver Detalles
-                </router-link>
+                        </router-link>
               </td>
             </tr>
           </tbody>
@@ -133,10 +140,10 @@ const actualizarIncidente = async (id, updates) => {
 
 const getPrioridadClass = (prioridad) => {
   switch (prioridad) {
-    case 'Alta': return 'bg-red-200 text-red-900';
-    case 'Media': return 'bg-yellow-200 text-yellow-900';
-    case 'Baja': return 'bg-green-200 text-green-900';
-    default: return 'bg-gray-200 text-gray-900';
+    case 'Alta': return 'bg-red-200 text-red-900 border-red-300';
+    case 'Media': return 'bg-yellow-200 text-yellow-900 border-yellow-300';
+    case 'Baja': return 'bg-green-200 text-green-900 border-green-300';
+    default: return 'bg-gray-200 text-gray-900 border-gray-300';
   }
 };
 
