@@ -50,21 +50,26 @@ router.get("/", async (req, res) => {
   const db = getDB();
   const { q } = req.query; // Capturamos el parámetro de búsqueda 'q'
    try {
-    let query = {}; // Por defecto, la consulta está vacía (trae todo)
+    let query = {}; 
 
-    // Si hay un término de búsqueda, construimos la consulta
     if (q) {
-      query = {
-        // Buscamos en 'titulo' y 'descripcion'
-        $or: [
-          // '$regex' permite búsquedas parciales, '$options: i' lo hace insensible a mayúsculas/minúsculas
-          { titulo: { $regex: q, $options: 'i' } },
-          { descripcion: { $regex: q, $options: 'i' } }
-        ]
-      };
+      // Verificamos si 'q' es un número
+      const numeroBuscado = parseInt(q, 10);
+      if (!isNaN(numeroBuscado)) {
+        // Si es un número, buscamos por 'numeroIncidente'
+        query = { numeroIncidente: numeroBuscado };
+      } else {
+        // Si NO es un número, buscamos en título y descripción como antes
+        query = {
+          $or: [
+            { titulo: { $regex: q, $options: 'i' } },
+            { descripcion: { $regex: q, $options: 'i' } }
+          ]
+        };
+      }
     }
 
-     const incidentes = await db.collection("incidentes").find(query).sort({ fechaCreacion: -1 }).toArray();
+    const incidentes = await db.collection("incidentes").find(query).sort({ fechaCreacion: -1 }).toArray();
     res.status(200).json(incidentes);
   } catch (err) {
     console.error("Error al obtener incidentes:", err);
