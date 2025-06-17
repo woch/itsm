@@ -41,6 +41,9 @@
               <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Fecha Creación
               </th>
+              <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+               Acciones
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -61,6 +64,14 @@
               </td>
               <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
                 {{ new Date(incidente.fechaCreacion).toLocaleDateString() }}
+              </td>
+              <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                <select v-model="incidente.estado" @change="actualizarEstado(incidente._id, $event.target.value)" class="text-xs p-1 rounded border">
+                  <option value="Abierto">Abierto</option>
+                  <option value="En Progreso">En Progreso</option>
+                  <option value="Resuelto">Resuelto</option>
+                  <option value="Cerrado">Cerrado</option>
+                </select>
               </td>
             </tr>
           </tbody>
@@ -100,6 +111,18 @@ const getPrioridadClass = (prioridad) => {
     case 'Media': return 'bg-yellow-200 text-yellow-900';
     case 'Baja': return 'bg-green-200 text-green-900';
     default: return 'bg-gray-200 text-gray-900';
+  }
+};
+
+const actualizarEstado = async (id, nuevoEstado) => {
+  try {
+    await apiClient.put(`/incidentes/${id}`, { estado: nuevoEstado });
+    // Opcional: mostrar una notificación de éxito
+    console.log(`Incidente ${id} actualizado a ${nuevoEstado}`);
+  } catch (err) {
+    console.error("Error al actualizar estado:", err);
+    // Revertir el cambio en la UI si falla la API
+    fetchIncidentes(); 
   }
 };
 
