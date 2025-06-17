@@ -48,10 +48,26 @@ router.post("/crear", async (req, res) => {
 // GET /incidentes - Listar todos los incidentes
 router.get("/", async (req, res) => {
   const db = getDB();
-  try {
-    const incidentes = await db.collection("incidentes").find().sort({ fechaCreacion: -1 }).toArray();
+  const { q } = req.query; // Capturamos el parámetro de búsqueda 'q'
+   try {
+    let query = {}; // Por defecto, la consulta está vacía (trae todo)
+
+    // Si hay un término de búsqueda, construimos la consulta
+    if (q) {
+      query = {
+        // Buscamos en 'titulo' y 'descripcion'
+        $or: [
+          // '$regex' permite búsquedas parciales, '$options: i' lo hace insensible a mayúsculas/minúsculas
+          { titulo: { $regex: q, $options: 'i' } },
+          { descripcion: { $regex: q, $options: 'i' } }
+        ]
+      };
+    }
+
+     const incidentes = await db.collection("incidentes").find(query).sort({ fechaCreacion: -1 }).toArray();
     res.status(200).json(incidentes);
   } catch (err) {
+    console.error("Error al obtener incidentes:", err);
     res.status(500).json({ error: "Error al obtener los incidentes" });
   }
 });
