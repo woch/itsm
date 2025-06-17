@@ -1,108 +1,92 @@
+<!-- src/components/IncidentCard.vue -->
 <template>
-  <div class="contenedor">
-    <h2>Gestión de Incidentes</h2>
-    <p class="subtitulo">Reporta y da seguimiento a problemas de IT</p>
+  <div class="p-8 bg-white shadow-lg rounded-lg max-w-2xl mx-auto text-gray-800">
+    <h2 class="text-2xl font-bold mb-4">Gestión de Incidentes</h2>
+    <p class="mb-6">Reporta y da seguimiento a problemas de IT.</p>
 
-    <!-- Botón para volver al menú -->
-    <div class="volver">
-      <button @click="volverMenu">⬅ Volver al menú principal</button>
-    </div>
+    <form @submit.prevent="enviarIncidente">
+      <div class="mb-4">
+        <label for="titulo" class="block text-sm font-medium text-gray-700">📝 Título</label>
+        <input type="text" id="titulo" v-model="incidente.titulo"
+          class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          required minlength="5">
+        <p v-if="!incidente.titulo" class="text-xs text-red-500 mt-1">El título es requerido.</p>
+      </div>
 
-    <div class="formulario">
-      <form @submit.prevent="enviarFormulario">
-        <div class="campo">
-          <label>
-            📝 Título
-            <input v-model="form.titulo" type="text" placeholder="Ej: Error al acceder al portal de pagos" />
-          </label>
-          <span v-if="v$.titulo.$error">Debe tener mínimo 5 caracteres.</span>
-        </div>
+      <div class="mb-4">
+        <label for="descripcion" class="block text-sm font-medium text-gray-700">📄 Descripción</label>
+        <textarea id="descripcion" v-model="incidente.descripcion" rows="4"
+          class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          required minlength="10"></textarea>
+        <p v-if="!incidente.descripcion" class="text-xs text-red-500 mt-1">La descripción es requerida.</p>
+      </div>
 
-        <div class="campo">
-          <label>
-            📄 Descripción
-            <textarea v-model="form.descripcion" placeholder="Ej: La página se queda cargando al intentar acceder..."></textarea>
-          </label>
-          <span v-if="v$.descripcion.$error">Debe tener mínimo 10 caracteres.</span>
-        </div>
+      <div class="mb-6">
+        <label for="prioridad" class="block text-sm font-medium text-gray-700">⚠ Prioridad</label>
+        <select id="prioridad" v-model="incidente.prioridad"
+          class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+          required>
+          <option disabled value="">Selecciona una prioridad</option>
+          <option value="Baja">Baja</option>
+          <option value="Media">Media</option>
+          <option value="Alta">Alta</option>
+        </select>
+        <p v-if="!incidente.prioridad" class="text-xs text-red-500 mt-1">La prioridad es requerida.</p>
+      </div>
 
-        <div class="campo">
-          <label>⚠ Prioridad</label>
-          <div class="radio-grupo">
-            <label class="opcion">
-              <input type="radio" value="baja" v-model="form.prioridad" /> Baja
-            </label>
-            <label class="opcion">
-              <input type="radio" value="media" v-model="form.prioridad" /> Media
-            </label>
-            <label class="opcion">
-              <input type="radio" value="alta" v-model="form.prioridad" /> Alta
-            </label>
-          </div>
-          <span v-if="v$.prioridad.$error">Selecciona una prioridad.</span>
-        </div>
-
-        <div class="acciones">
-          <button type="submit" :class="['boton', colorBoton]">
-            Enviar Incidente
-          </button>
-        </div>
-      </form>
-    </div>
+      <div class="flex justify-end">
+        <button type="submit"
+          class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          :disabled="isSubmitting">
+          {{ isSubmitting ? 'Enviando...' : 'Enviar Incidente' }}
+        </button>
+      </div>
+    </form>
+    
+    <p v-if="mensaje" class="mt-4 text-center" :class="esError ? 'text-red-500' : 'text-green-500'">
+      {{ mensaje }}
+    </p>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import useVuelidate from '@vuelidate/core'
-import { required, minLength } from '@vuelidate/validators'
+import { ref } from 'vue';
+import apiClient from '../services/api'; // Asegúrate que la ruta es correcta
 
-const router = useRouter()
-
-const form = ref({
+const incidente = ref({
   titulo: '',
   descripcion: '',
   prioridad: '',
-  estado: 'abierto',
-  creado_en: new Date().toISOString(),
-  cerrado_en: null
-})
+});
 
-const rules = {
-  titulo: { required, minLength: minLength(5) },
-  descripcion: { required, minLength: minLength(10) },
-  prioridad: { required }
-}
+const isSubmitting = ref(false);
+const mensaje = ref('');
+const esError = ref(false);
 
-const v$ = useVuelidate(rules, form)
-
-const colorBoton = computed(() => {
-  switch (form.value.prioridad) {
-    case 'baja':
-      return 'baja'
-    case 'media':
-      return 'media'
-    case 'alta':
-      return 'alta'
-    default:
-      return 'sin-prioridad'
-  }
-})
-
-const enviarFormulario = async () => {
-  const valido = await v$.value.$validate()
-  if (!valido) {
-    alert('Por favor completa todos los campos correctamente.')
-    return
+const enviarIncidente = async () => {
+  if (!incidente.value.titulo || !incidente.value.descripcion || !incidente.value.prioridad) {
+    mensaje.value = 'Por favor, completa todos los campos.';
+    esError.value = true;
+    return;
   }
 
-  console.log('Incidente enviado:', JSON.parse(JSON.stringify(form.value)))
-}
+  isSubmitting.value = true;
+  mensaje.value = '';
+  esError.value = false;
 
-const volverMenu = () => {
-  router.push('/') // Cambia esta ruta si tu menú principal es otra
-}
+  try {
+    const response = await apiClient.post('/incidentes/crear', incidente.value);
+    mensaje.value = `${response.data.mensaje}. Número de Incidente: ${response.data.numeroIncidente}`;
+    esError.value = false;
+    // Limpiar formulario
+    incidente.value = { titulo: '', descripcion: '', prioridad: '' };
+  } catch (error) {
+    mensaje.value = error.response?.data?.error || 'Ocurrió un error al enviar el incidente.';
+    esError.value = true;
+  } finally {
+    isSubmitting.value = false;
+  }
+};
 </script>
 
 <style scoped>
