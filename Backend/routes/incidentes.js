@@ -122,5 +122,43 @@ router.get("/:id", async (req, res) => {
     }
 });
 
+router.post("/:id/respuesta", async (req, res) => {
+    const db = getDB();
+    const { id } = req.params;
+    const { autor, texto } = req.body; // Esperamos el autor y el texto de la respuesta
+
+    if (!ObjectId.isValid(id)) {
+        return res.status(400).json({ error: "ID de incidente no válido." });
+    }
+
+    if (!autor || !texto) {
+        return res.status(400).json({ error: "El autor y el texto de la respuesta son requeridos." });
+    }
+
+    const nuevaRespuesta = {
+        _id: new ObjectId(), // Generamos un ID único para la respuesta
+        autor,
+        texto,
+        fecha: new Date()
+    };
+
+    try {
+        const result = await db.collection("incidentes").updateOne(
+            { _id: new ObjectId(id) },
+            { $push: { historial: nuevaRespuesta } } // Añadimos la respuesta al array 'historial'
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ error: "Incidente no encontrado." });
+        }
+
+        res.status(201).json({ mensaje: "Respuesta añadida con éxito", respuesta: nuevaRespuesta });
+
+    } catch (err) {
+        console.error("Error al añadir respuesta:", err);
+        res.status(500).json({ error: "No se pudo añadir la respuesta." });
+    }
+});
+
 module.exports = router;
 

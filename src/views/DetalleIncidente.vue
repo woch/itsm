@@ -19,10 +19,10 @@
             Ticket #{{ incidente.numeroIncidente }} - Creado el {{ new Date(incidente.fechaCreacion).toLocaleString() }}
           </p>
         </div>
-        <router-link to="/incidentes" class="text-blue-600 hover:underline">← Volver al listado</router-link>
+        <router-link to="/incidentes" class="text-blue-600 hover:underline flex-shrink-0 ml-4">← Volver al listado</router-link>
       </div>
 
-      <!-- Datos Principales en Tarjetas -->
+      <!-- Datos Principales -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class="bg-gray-100 p-4 rounded-lg">
           <h3 class="font-semibold text-gray-600 text-sm">Estado</h3>
@@ -40,11 +40,47 @@
         <p class="text-gray-600 whitespace-pre-wrap">{{ incidente.descripcion }}</p>
       </div>
 
-      <!-- Siguientes pasos aquí: Historial y Formulario de Respuesta -->
+      <!-- =============================================== -->
+      <!-- Sección de Historial y Respuestas -->
+      <!-- =============================================== -->
       <div class="border-t pt-6">
         <h2 class="text-xl font-semibold text-gray-700 mb-4">Historial y Respuestas</h2>
-        <p class="text-gray-500">Próximamente aquí...</p>
+
+        <!-- Lista de Respuestas -->
+        <div class="space-y-4 mb-6">
+          <div v-if="!incidente.historial || incidente.historial.length === 0" class="text-center text-gray-500 py-4">
+            No hay respuestas todavía.
+          </div>
+          <div v-else v-for="item in incidente.historial" :key="item._id" class="bg-gray-50 p-4 rounded-lg border">
+            <p class="text-gray-800">{{ item.texto }}</p>
+            <p class="text-right text-xs text-gray-500 mt-2">
+              - <span class="font-semibold">{{ item.autor }}</span> el {{ new Date(item.fecha).toLocaleString() }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Formulario para Nueva Respuesta -->
+        <form @submit.prevent="enviarRespuesta">
+          <h3 class="font-semibold text-gray-700 mb-2">Añadir una nueva respuesta</h3>
+          <textarea 
+            v-model="nuevaRespuestaTexto"
+            rows="4" 
+            placeholder="Escribe tu comentario o solución aquí..."
+            class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          ></textarea>
+          <div class="flex justify-end mt-2">
+            <button 
+              type="submit"
+              :disabled="enviandoRespuesta"
+              class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-blue-300 transition-colors">
+              {{ enviandoRespuesta ? 'Enviando...' : 'Enviar Respuesta' }}
+            </button>
+          </div>
+        </form>
       </div>
+      <!-- Fin de la sección de Historial -->
+
     </div>
   </div>
 </template>
@@ -59,7 +95,12 @@ const incidente = ref(null);
 const cargando = ref(true);
 const error = ref(null);
 
+// --- NUEVAS VARIABLES REACTIVAS ---
+const nuevaRespuestaTexto = ref('');
+const enviandoRespuesta = ref(false);
+
 const fetchIncidente = async () => {
+  // ... (esta función no cambia)
   const incidenteId = route.params.id;
   cargando.value = true;
   error.value = null;
@@ -73,7 +114,40 @@ const fetchIncidente = async () => {
   }
 };
 
+// --- NUEVA FUNCIÓN ---
+const enviarRespuesta = async () => {
+  if (!nuevaRespuestaTexto.value.trim()) {
+    alert('La respuesta no puede estar vacía.');
+    return;
+  }
+
+  enviandoRespuesta.value = true;
+  const incidenteId = route.params.id;
+  
+  try {
+    const response = await apiClient.post(`/incidentes/${incidenteId}/respuesta`, {
+      texto: nuevaRespuestaTexto.value,
+      // En una app real, el autor vendría del usuario logueado.
+      // Por ahora, lo pondremos fijo.
+      autor: 'Equipo de Soporte' 
+    });
+
+    // Añadimos la nueva respuesta al historial local para una actualización instantánea
+    incidente.value.historial.push(response.data.respuesta);
+    
+    // Limpiamos el textarea
+    nuevaRespuestaTexto.value = '';
+
+  } catch (err) {
+    alert('Error al enviar la respuesta. Inténtalo de nuevo.');
+    console.error(err);
+  } finally {
+    enviandoRespuesta.value = false;
+  }
+};
+
 const getPrioridadClass = (prioridad) => {
+  // ... (esta función no cambia)
   switch (prioridad) {
     case 'Alta': return 'text-red-600';
     case 'Media': return 'text-yellow-600';
