@@ -68,7 +68,11 @@
               </td>
               <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-900">{{ new Date(incidente.fechaCreacion).toLocaleDateString() }}</td>
               <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-gray-900">
-                <button class="text-blue-600 hover:text-blue-900 text-sm">Ver Detalles</button>
+                <router-link 
+                          :to="{ name: 'DetalleIncidente', params: { id: incidente._id } }"
+                          class="text-blue-600 hover:text-blue-900 font-semibold text-sm">
+                          Ver Detalles
+                </router-link>
               </td>
             </tr>
           </tbody>

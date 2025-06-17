@@ -5,11 +5,13 @@ import Solicitudes from '../views/Solicitudes.vue'
 import BaseConocimiento from '../views/baseConocimiento.vue'
 import Login from '../views/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
+import DetalleIncidente from '../views/DetalleIncidente.vue'
 
 
 const routes = [
   { path: '/', name: 'Home', component: Home, meta: { requiresAuth: true } },
   { path: '/incidentes', component: Incidentes, meta: { requiresAuth: true } },
+  { path: '/incidentes/:id', name: 'DetalleIncidente', component: DetalleIncidente, meta: { requiresAuth: true } },
   { path: '/solicitudes', component: Solicitudes, meta: { requiresAuth: true } },
   { path: '/conocimiento', component: BaseConocimiento, meta: { requiresAuth: true } },
   { path: '/dashboard', component: Dashboard, meta: { requiresAuth: true } },

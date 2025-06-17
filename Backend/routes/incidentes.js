@@ -99,5 +99,28 @@ router.put("/:id", async (req, res) => {
     }
 });
 
+router.get("/:id", async (req, res) => {
+    const db = getDB();
+    const { id } = req.params;
+
+    // Validación para asegurarse que el ID es válido para MongoDB
+    if (!ObjectId.isValid(id)) {
+        return res.status(400).json({ error: "ID de incidente no válido." });
+    }
+
+    try {
+        const incidente = await db.collection("incidentes").findOne({ _id: new ObjectId(id) });
+        
+        if (!incidente) {
+            return res.status(404).json({ error: "Incidente no encontrado." });
+        }
+
+        res.status(200).json(incidente);
+    } catch (err) {
+        console.error("Error al obtener el incidente:", err);
+        res.status(500).json({ error: "Error al obtener el incidente." });
+    }
+});
+
 module.exports = router;
 
