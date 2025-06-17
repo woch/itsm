@@ -49,18 +49,21 @@ router.post("/crear", async (req, res) => {
 router.get("/", async (req, res) => {
   const db = getDB();
   const { q } = req.query; // Capturamos el parámetro de búsqueda 'q'
-   try {
-    let query = {}; 
+  try {
+    // ---- MODIFICACIÓN CLAVE AQUÍ ----
+    // Condición base para excluir siempre los incidentes convertidos
+    const baseQuery = {
+        estado: { $ne: "Cerrado (Convertido a Problema)" }
+    };
+    // -------------------------------
 
+    let searchQuery = {}; 
     if (q) {
-      // Verificamos si 'q' es un número
       const numeroBuscado = parseInt(q, 10);
       if (!isNaN(numeroBuscado)) {
-        // Si es un número, buscamos por 'numeroIncidente'
-        query = { numeroIncidente: numeroBuscado };
+        searchQuery = { numeroIncidente: numeroBuscado };
       } else {
-        // Si NO es un número, buscamos en título y descripción como antes
-        query = {
+        searchQuery = {
           $or: [
             { titulo: { $regex: q, $options: 'i' } },
             { descripcion: { $regex: q, $options: 'i' } }
@@ -68,8 +71,13 @@ router.get("/", async (req, res) => {
         };
       }
     }
+    // Combinamos la consulta base con la de búsqueda usando $and
+    const finalQuery = { $and: [baseQuery, searchQuery] };
+    
+    // Si no hay búsqueda, usamos solo la consulta base
+    const queryToExecute = q ? finalQuery : baseQuery;
 
-    const incidentes = await db.collection("incidentes").find(query).sort({ fechaCreacion: -1 }).toArray();
+    const incidentes = await db.collection("incidentes").find(queryToExecute).sort({ fechaCreacion: -1 }).toArray();
     res.status(200).json(incidentes);
   } catch (err) {
     console.error("Error al obtener incidentes:", err);
