@@ -1,57 +1,83 @@
 <!-- src/components/IncidentCard.vue -->
 <template>
-  <div class="p-8 bg-white shadow-lg rounded-lg max-w-2xl mx-auto text-gray-800">
-    <h2 class="text-2xl font-bold mb-4">Gestión de Incidentes</h2>
-    <p class="mb-6">Reporta y da seguimiento a problemas de IT.</p>
+  <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+    <div class="text-center mb-8">
+      <h2 class="text-2xl font-bold text-gray-800">Crear Nuevo Incidente</h2>
+      <p class="text-gray-500 mt-1">Reporta y da seguimiento a problemas de IT.</p>
+    </div>
 
-    <form @submit.prevent="enviarIncidente">
-      <div class="mb-4">
-        <label for="titulo" class="block text-sm font-medium text-gray-700">📝 Título</label>
-        <input type="text" id="titulo" v-model="incidente.titulo"
-          class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          required minlength="5">
-        <p v-if="!incidente.titulo" class="text-xs text-red-500 mt-1">El título es requerido.</p>
+    <form @submit.prevent="enviarIncidente" class="space-y-6">
+      <!-- Campo Título -->
+      <div>
+        <label for="titulo" class="block text-sm font-semibold text-gray-700 mb-1">
+          📝 Título del Incidente
+        </label>
+        <input 
+          type="text" 
+          id="titulo" 
+          v-model="incidente.titulo"
+          class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          placeholder="Ej: La impresora no funciona"
+          required 
+          minlength="5">
+        <p v-if="errores.titulo" class="text-xs text-red-600 mt-1">{{ errores.titulo }}</p>
       </div>
 
-      <div class="mb-4">
-        <label for="descripcion" class="block text-sm font-medium text-gray-700">📄 Descripción</label>
-        <textarea id="descripcion" v-model="incidente.descripcion" rows="4"
-          class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          required minlength="10"></textarea>
-        <p v-if="!incidente.descripcion" class="text-xs text-red-500 mt-1">La descripción es requerida.</p>
+      <!-- Campo Descripción -->
+      <div>
+        <label for="descripcion" class="block text-sm font-semibold text-gray-700 mb-1">
+          📄 Descripción Detallada
+        </label>
+        <textarea 
+          id="descripcion" 
+          v-model="incidente.descripcion" 
+          rows="4"
+          class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+          placeholder="Describe el problema con el mayor detalle posible..."
+          required 
+          minlength="10"></textarea>
+        <p v-if="errores.descripcion" class="text-xs text-red-600 mt-1">{{ errores.descripcion }}</p>
       </div>
 
-      <div class="mb-6">
-        <label for="prioridad" class="block text-sm font-medium text-gray-700">⚠ Prioridad</label>
-        <select id="prioridad" v-model="incidente.prioridad"
-          class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+      <!-- Campo Prioridad -->
+      <div>
+        <label for="prioridad" class="block text-sm font-semibold text-gray-700 mb-1">
+          ⚠️ Prioridad
+        </label>
+        <select 
+          id="prioridad" 
+          v-model="incidente.prioridad"
+          class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           required>
           <option disabled value="">Selecciona una prioridad</option>
           <option value="Baja">Baja</option>
           <option value="Media">Media</option>
           <option value="Alta">Alta</option>
         </select>
-        <p v-if="!incidente.prioridad" class="text-xs text-red-500 mt-1">La prioridad es requerida.</p>
+        <p v-if="errores.prioridad" class="text-xs text-red-600 mt-1">{{ errores.prioridad }}</p>
       </div>
 
-      <div class="flex justify-end">
-        <button type="submit"
-          class="bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+      <!-- Botón de Envío -->
+      <div class="pt-4">
+        <button 
+          type="submit"
+          class="w-full bg-gray-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 transition-transform transform hover:scale-105 disabled:bg-gray-400"
           :disabled="isSubmitting">
           {{ isSubmitting ? 'Enviando...' : 'Enviar Incidente' }}
         </button>
       </div>
     </form>
     
-    <p v-if="mensaje" class="mt-4 text-center" :class="esError ? 'text-red-500' : 'text-green-500'">
+    <!-- Mensaje de Éxito/Error Global -->
+    <p v-if="mensaje" class="mt-4 text-center text-sm" :class="esError ? 'text-red-600' : 'text-green-600'">
       {{ mensaje }}
     </p>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import apiClient from '../services/api'; // Asegúrate que la ruta es correcta
+import { ref, reactive } from 'vue';
+import apiClient from '../services/api';
 
 const incidente = ref({
   titulo: '',
@@ -59,14 +85,33 @@ const incidente = ref({
   prioridad: '',
 });
 
+// Usamos un objeto reactivo para los errores, es más limpio
+const errores = reactive({
+  titulo: null,
+  descripcion: null,
+  prioridad: null,
+});
+
 const isSubmitting = ref(false);
 const mensaje = ref('');
 const esError = ref(false);
 
+const emit = defineEmits(['incidenteCreado']);
+
+const validarFormulario = () => {
+  let esValido = true;
+  errores.titulo = !incidente.value.titulo ? 'El título es requerido.' : null;
+  errores.descripcion = !incidente.value.descripcion ? 'La descripción es requerida.' : null;
+  errores.prioridad = !incidente.value.prioridad ? 'La prioridad es requerida.' : null;
+  
+  if (errores.titulo || errores.descripcion || errores.prioridad) {
+    esValido = false;
+  }
+  return esValido;
+};
+
 const enviarIncidente = async () => {
-  if (!incidente.value.titulo || !incidente.value.descripcion || !incidente.value.prioridad) {
-    mensaje.value = 'Por favor, completa todos los campos.';
-    esError.value = true;
+  if (!validarFormulario()) {
     return;
   }
 
@@ -78,8 +123,13 @@ const enviarIncidente = async () => {
     const response = await apiClient.post('/incidentes/crear', incidente.value);
     mensaje.value = `${response.data.mensaje}. Número de Incidente: ${response.data.numeroIncidente}`;
     esError.value = false;
+    
     // Limpiar formulario
     incidente.value = { titulo: '', descripcion: '', prioridad: '' };
+    
+    // Notificar al componente padre que se creó el incidente
+    emit('incidenteCreado');
+
   } catch (error) {
     mensaje.value = error.response?.data?.error || 'Ocurrió un error al enviar el incidente.';
     esError.value = true;
