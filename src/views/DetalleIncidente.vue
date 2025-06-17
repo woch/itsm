@@ -41,6 +41,22 @@
       </div>
 
       <!-- =============================================== -->
+      <!-- NUEVO: Sección de Acciones -->
+      <!-- =============================================== -->
+      <div class="border-t pt-4 mt-6 mb-6">
+          <h3 class="text-lg font-semibold text-gray-700 mb-3">Acciones</h3>
+          <button 
+            @click="convertirAProblema"
+            :disabled="convirtiendo || incidente.estado.startsWith('Cerrado')"
+            class="bg-orange-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed transition-colors">
+            {{ convirtiendo ? 'Convirtiendo...' : 'Convertir a Problema' }}
+          </button>
+          <p v-if="incidente.estado.startsWith('Cerrado')" class="text-xs text-gray-500 mt-1">
+            Esta acción no está disponible para incidentes cerrados.
+          </p>
+      </div>
+
+      <!-- =============================================== -->
       <!-- Sección de Historial y Respuestas -->
       <!-- =============================================== -->
       <div class="border-t pt-6">
@@ -98,6 +114,7 @@ const error = ref(null);
 // --- NUEVAS VARIABLES REACTIVAS ---
 const nuevaRespuestaTexto = ref('');
 const enviandoRespuesta = ref(false);
+const convirtiendo = ref(false);
 
 const fetchIncidente = async () => {
   // ... (esta función no cambia)
@@ -145,6 +162,34 @@ const enviarRespuesta = async () => {
     enviandoRespuesta.value = false;
   }
 };
+
+const convertirAProblema = async () => {
+    if (!confirm('¿Estás seguro de que quieres convertir este incidente en un problema? Esta acción no se puede deshacer.')) {
+        return;
+    }
+
+    convirtiendo.value = true;
+    const incidenteId = route.params.id;
+
+    try {
+        const response = await apiClient.post(`/incidentes/${incidenteId}/convertir`);
+        
+        // Actualizamos el estado en el frontend para reflejar el cambio al instante
+        incidente.value.estado = response.data.nuevoEstadoIncidente;
+        
+        alert(`¡Éxito! El incidente fue convertido al problema con ID: ${response.data.idProblema}`);
+
+        // Opcional: recargar los datos para obtener la nueva nota del historial
+        await fetchIncidente(); 
+        
+    } catch (err) {
+        alert(err.response?.data?.error || 'Ocurrió un error al convertir el incidente.');
+        console.error(err);
+    } finally {
+        convirtiendo.value = false;
+    }
+};
+
 
 const getPrioridadClass = (prioridad) => {
   // ... (esta función no cambia)

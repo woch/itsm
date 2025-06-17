@@ -160,5 +160,69 @@ router.post("/:id/respuesta", async (req, res) => {
     }
 });
 
+router.post("/:id/convertir", async (req, res) => {
+    const db = getDB();
+    const { id } = req.params;
+
+    if (!ObjectId.isValid(id)) {
+        return res.status(400).json({ error: "ID de incidente no válido." });
+    }
+
+    try {
+        // 1. Encontrar el incidente original
+        const incidenteOriginal = await db.collection("incidentes").findOne({ _id: new ObjectId(id) });
+
+        if (!incidenteOriginal) {
+            return res.status(404).json({ error: "Incidente no encontrado." });
+        }
+        
+        // Evitar convertir un incidente que ya fue cerrado o convertido
+        if (incidenteOriginal.estado.startsWith("Cerrado")) {
+            return res.status(400).json({ error: "Este incidente ya está cerrado y no puede ser convertido." });
+        }
+
+        // 2. Crear el nuevo documento de problema
+        const nuevoProblema = {
+            titulo: `Problema derivado de Incidente #${incidenteOriginal.numeroIncidente}: ${incidenteOriginal.titulo}`,
+            descripcion: incidenteOriginal.descripcion,
+            estado: "Abierto", // Estado inicial del problema
+            fechaCreacion: new Date(),
+            incidentesRelacionados: [incidenteOriginal._id], // Guardamos la referencia al incidente original
+            historial: [],
+        };
+        
+        // Insertamos el nuevo problema en la colección 'problemas'
+        const problemaCreado = await db.collection("problemas").insertOne(nuevoProblema);
+
+
+        // 3. Actualizar el incidente original
+        const nuevoEstado = "Cerrado (Convertido a Problema)";
+        const notaHistorial = {
+            _id: new ObjectId(),
+            autor: "Sistema",
+            texto: `Incidente convertido a Problema con ID: ${problemaCreado.insertedId}.`,
+            fecha: new Date()
+        };
+
+        await db.collection("incidentes").updateOne(
+            { _id: new ObjectId(id) },
+            { 
+                $set: { estado: nuevoEstado },
+                $push: { historial: notaHistorial }
+            }
+        );
+
+        res.status(200).json({ 
+            mensaje: "Incidente convertido a problema con éxito.",
+            idProblema: problemaCreado.insertedId,
+            nuevoEstadoIncidente: nuevoEstado
+        });
+
+    } catch (err) {
+        console.error("Error al convertir incidente:", err);
+        res.status(500).json({ error: "Error interno al convertir el incidente." });
+    }
+});
+
 module.exports = router;
 
