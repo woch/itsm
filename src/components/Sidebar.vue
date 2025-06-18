@@ -32,10 +32,10 @@ const menu = [
   { label: 'Solicitudes de Servicio', icon: ClipboardList, route: '/solicitudes' },  
   { label: 'Problemas', icon: AlertTriangle, route: '/problemas' },  
   { label: 'Gestión de Cambios', icon: GitPullRequest, route: '/cambios' },  
-  { label: 'Base de Conocimiento', icon: BookOpen, route: '/conocimiento' },  
+  { label: 'Base de Conocimiento', icon: BookOpen, route: '/admin/conocimiento' },  
   { label: 'Gestión de Activos IT', icon: Server, route: '/activos' },  
   { label: 'Gestión de Niveles de Servicio', icon: TrendingUp, route: '/niveles-servicio' },  
   { label: 'Reportes', icon: BarChart, route: '/reportes' },  
-  { label: 'Usuarios', icon: Users, route: '/usuarios' }  
+  { label: 'Usuarios', icon: Users, route: '/admin/usuarios' }  
 ]  
 </script>

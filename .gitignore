@@ -1,0 +1,36 @@
+# node_modules: dependencias instaladas
+node_modules/
+
+# output de producción de Vite
+dist/
+
+# archivos temporales del sistema operativo
+.DS_Store
+Thumbs.db
+
+# archivos de logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# entorno
+.env
+.env.*.local
+
+# VSCode settings (opcional)
+.vscode/
+
+# cache de Vite
+.vite/
+
+# coverage reports (si usas tests)
+coverage/
+
+# Mac
+*.DS_Store
+
+# IDEs
+.idea/
+*.sublime-project
+*.sublime-workspace
