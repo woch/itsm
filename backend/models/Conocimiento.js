@@ -1,6 +1,6 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose');
 
-const conocimientoSchema = new mongoose.Schema({
+const ConocimientoSchema = new mongoose.Schema({
   titulo: { type: String, required: true },
   descripcion: { type: String, required: true },
   enlaceVideo: { type: String },
@@ -11,6 +11,6 @@ const conocimientoSchema = new mongoose.Schema({
     enum: ['Caja Registradora', 'POS', 'Computadora', 'Acceso', 'Internet', 'Otros']
   },
   creado_en: { type: Date, default: Date.now }
-})
+});
 
-export default mongoose.model('Conocimiento', conocimientoSchema)
+module.exports = mongoose.model('Conocimiento', ConocimientoSchema);

@@ -1,6 +1,6 @@
 // src/services/apiCambios.js
 
-const API_URL = 'http://localhost:3001/cambios'; // Esta URL también cambiará luego
+const API_URL = 'http://localhost:5001/cambios'; // Esta URL también cambiará luego
 
 // Obtener todos los cambios
 export async function getCambios() {

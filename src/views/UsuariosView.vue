@@ -81,9 +81,12 @@
     </div>
 </template>
 
+// En tu componente de Vue
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import axios from 'axios'
+// IMPORTANTE: Asegúrate de estar usando tu 'apiClient' configurado, no axios directamente
+// para que herede la baseURL y los interceptores.
+import apiClient from '../services/api' // Asumiendo que está en src/services/api.js
 import { Plus, Pencil, Trash2, Search } from 'lucide-vue-next'
 import Sidebar from '../components/Sidebar.vue'
 
@@ -91,24 +94,32 @@ const usuarios = ref([])
 const busqueda = ref('')
 const mostrarModal = ref(false)
 const usuarioEditando = ref(null)
+
+// El 'form' representa lo que el usuario ve en el modal.
 const form = ref({
     nombre: '',
     apellido: '',
-    correo: '',
-    contraseña: '',
+    correo: '',       // El usuario ve y edita 'correo'
+    contrasena: '', // El usuario ve y edita 'contrasena' (con ñ)
     rol: '',
     departamento: '',
 })
 
 // Cargar usuarios
 const obtenerUsuarios = async () => {
-    const res = await axios.get('http://localhost:5001/api/usuarios')
-    usuarios.value = res.data
+    try {
+        // Usamos apiClient para no repetir la URL completa
+        const res = await apiClient.get('/usuarios')
+        // El backend devuelve 'usuario' pero la tabla muestra 'correo'. Mapeamos.
+        usuarios.value = res.data.map(u => ({ ...u, correo: u.usuario }));
+    } catch (error) {
+        console.error("Error al obtener usuarios:", error)
+    }
 }
 
 onMounted(obtenerUsuarios)
 
-// Filtro de búsqueda
+// Filtro de búsqueda (sin cambios)
 const filtrados = computed(() =>
     usuarios.value.filter(u =>
         (u.nombre + ' ' + u.apellido + u.correo)
@@ -117,12 +128,12 @@ const filtrados = computed(() =>
     )
 )
 
-// Modal
+// Modal (adaptamos para el mapeo)
 const abrirModal = (usuario = null) => {
     usuarioEditando.value = usuario
     form.value = usuario
-        ? { ...usuario, contraseña: '' }
-        : { nombre: '', apellido: '', correo: '', contraseña: '', rol: '', departamento: '' }
+        ? { ...usuario, contraseña: '' } // El usuario que llega ya tiene 'correo'
+        : { nombre: '', apellido: '', correo: '', contrasena: '', rol: '', departamento: '' }
     mostrarModal.value = true
 }
 
@@ -131,21 +142,53 @@ const cerrarModal = () => {
     mostrarModal.value = false
 }
 
+// --- SECCIÓN CORREGIDA ---
 // Guardar usuario
 const guardarUsuario = async () => {
-    if (usuarioEditando.value) {
-        await axios.put(`http://localhost:5001/api/usuarios/${usuarioEditando.value._id}`, form.value)
-    } else {
-        await axios.post('http://localhost:5001/api/usuarios', form.value)
+    // 1. Mapear los roles del frontend a los del backend
+    const rolesMap = {
+        'Administrador': 'admin',
+        'Encargado': 'it', // Asumiendo que 'Encargado' equivale a 'it'
+        'Usuario': 'usuario'
+    };
+
+    // 2. Construir el objeto de datos que se enviará al backend
+    const payload = {
+        nombre: form.value.nombre,
+        apellido: form.value.apellido,
+        usuario: form.value.correo,      // Se envía 'correo' del form como 'usuario'
+        contrasena: form.value.contrasena, // Se envía 'contraseña' del form como 'contrasena'
+        rol: rolesMap[form.value.rol] || 'usuario', // Mapeamos el rol, con 'usuario' como default
+        departamento: form.value.departamento
+    };
+
+    // Si no se está editando, la contraseña es obligatoria en el payload
+    if (usuarioEditando.value && !payload.contrasena) {
+        delete payload.contrasena; // No enviar contraseña vacía al editar
     }
-    await obtenerUsuarios()
-    cerrarModal()
+
+    try {
+        if (usuarioEditando.value) {
+            // Actualizar usuario
+            await apiClient.put(`/usuarios/${usuarioEditando.value._id}`, payload)
+        } else {
+            // Crear nuevo usuario
+            await apiClient.post('/usuarios', payload)
+        }
+        await obtenerUsuarios() // Recargar la lista de usuarios
+        cerrarModal() // Cerrar el modal
+    } catch (error) {
+        // Mostrar el mensaje de error específico del backend
+        alert(error.response?.data?.error || 'Ocurrió un error al guardar el usuario.')
+        console.error("Error al guardar usuario:", error.response)
+    }
 }
 
-// Eliminar
+
+// Eliminar (sin cambios, pero usando apiClient)
 const eliminarUsuario = async (id) => {
     if (confirm('¿Eliminar este usuario?')) {
-        await axios.delete(`http://localhost:5001/api/usuarios/${id}`)
+        await apiClient.delete(`/usuarios/${id}`)
         await obtenerUsuarios()
     }
 }

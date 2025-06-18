@@ -1,6 +1,6 @@
 // src/services/apiActivos.js
 
-const API_URL = 'http://localhost:3001/activos'; // Esta URL cambiará cuando Alberto suba el backend
+const API_URL = 'http://localhost:5001/activos'; // Esta URL cambiará cuando Alberto suba el backend
 
 // Obtener todos los activos
 export async function getActivos() {
