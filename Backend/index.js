@@ -1,10 +1,8 @@
-<<<<<<< HEAD
 require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const { conectarMongo } = require("./db");
 const incidentesRoutes = require("./routes/incidentes");
-=======
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
 import Incidentes from '../views/Incidentes.vue'
@@ -14,7 +12,6 @@ import Login from '../views/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
 import PageCambios from '../views/PageCambios.vue'      // ✅ Vista de Cambios
 import PageActivos from '../views/PageActivos.vue'      // ✅ Vista de Activos (nueva línea)
->>>>>>> main
 
 const routes = [
   { path: '/', name: 'Home', component: Home, meta: { requiresAuth: true } },

@@ -5,12 +5,9 @@ import Solicitudes from '../views/Solicitudes.vue'
 import BaseConocimiento from '../views/baseConocimiento.vue'
 import Login from '../views/Login.vue'
 import Dashboard from '../views/Dashboard.vue'
-<<<<<<< HEAD
 import DetalleIncidente from '../views/DetalleIncidente.vue'
-=======
 import PageCambios from '../views/PageCambios.vue' // ✅ NUEVA LÍNEA
 import PageActivos from '../views/PageActivos.vue' //
->>>>>>> main
 
 
 const routes = [
