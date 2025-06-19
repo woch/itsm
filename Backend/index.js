@@ -1,4 +1,5 @@
 // Backend/index.js
+
 require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
@@ -8,8 +9,8 @@ const { conectarDB } = require("./db");
 const incidentesRoutes = require("./routes/incidentes");
 const activosRoutes = require("./routes/activos");
 const conocimientoRoutes = require("./routes/conocimiento");
-const usuariosRoutes = require("./routes/usuarios"); // Asegúrate de que esta línea esté presente
-// const authRoutes = require("./routes/auth"); // La dejaremos comentada por ahora
+const usuariosRoutes = require("./routes/usuarios");
+const authRoutes = require("./routes/auth"); // <-- Ahora sí existe este archivo
 
 const app = express();
 
@@ -21,8 +22,8 @@ app.use(express.json());
 app.use("/api/incidentes", incidentesRoutes);
 app.use("/api/activos", activosRoutes);
 app.use("/api/conocimiento", conocimientoRoutes);
-app.use("/api/usuarios", usuariosRoutes); // Y que esta línea también
-// app.use("/api/auth", authRoutes);
+app.use("/api/usuarios", usuariosRoutes);
+app.use("/api/auth", authRoutes); // <-- Y la usamos aquí
 
 const PORT = process.env.PORT || 3001;
 
