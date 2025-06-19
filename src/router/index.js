@@ -12,11 +12,13 @@ import ConocimientoView from '../views/ConocimientoView.vue' // Importar la vist
 import UsuariosVIew from '../views/UsuariosView.vue' // Importar la vista de Usuarios
 import SolicitudesView from '../views/SolicitudesView.vue'
 import GestionCambiosView from '../views/GestionCambiosView.vue'
+import AdminIncidentes from '../views/AdminIncidentes.vue'
 
 
 const routes = [
   { path: '/', name: 'Home', component: Home, meta: { requiresAuth: true } },
   { path: '/incidentes', component: Incidentes, meta: { requiresAuth: true } },
+  { path: '/admin/incidentes', name: 'AdminIncidentes', component: AdminIncidentes, meta: { requiresAuth: true } },
   { path: '/incidentes/:id', name: 'DetalleIncidente', component: DetalleIncidente, meta: { requiresAuth: true } },
   { path: '/solicitudes', component: Solicitudes, meta: { requiresAuth: true } },
   { path: '/admin/solicitudes', component: SolicitudesView, meta: { requiresAuth: true } },

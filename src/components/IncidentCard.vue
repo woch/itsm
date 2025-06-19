@@ -1,77 +1,40 @@
 <!-- src/components/IncidentCard.vue -->
 <template>
-  <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg border border-gray-200">
-    <div class="text-center mb-8">
-      <h2 class="text-2xl font-bold text-gray-800">Crear Nuevo Incidente</h2>
-      <p class="text-gray-500 mt-1">Reporta y da seguimiento a problemas de IT.</p>
-    </div>
-
-    <form @submit.prevent="enviarIncidente" class="space-y-6">
-      <!-- Campo Título -->
+  <div class="w-full max-w-lg p-8 space-y-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
+    <h2 class="text-2xl font-bold text-center text-gray-900 dark:text-white">
+      Crear Nuevo Incidente
+    </h2>
+    <p class="text-center text-gray-600 dark:text-gray-400">
+      Reporta y da seguimiento a problemas de IT.
+    </p>
+    <form @submit.prevent="submitForm" class="space-y-4">
       <div>
-        <label for="titulo" class="block text-sm font-semibold text-gray-700 mb-1">
-          📝 Título del Incidente
-        </label>
-        <input 
-          type="text" 
-          id="titulo" 
-          v-model="incidente.titulo"
-          class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-          placeholder="Ej: La impresora no funciona"
-          required 
-          minlength="5">
-        <p v-if="errores.titulo" class="text-xs text-red-600 mt-1">{{ errores.titulo }}</p>
+        <label for="titulo" class="block text-sm font-medium text-left text-gray-700 dark:text-gray-300">📝 Título del Incidente</label>
+        <input v-model="incidente.titulo" type="text" id="titulo" class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+        <p v-if="errores.titulo" class="mt-1 text-xs text-red-500">{{ errores.titulo }}</p>
       </div>
-
-      <!-- Campo Descripción -->
       <div>
-        <label for="descripcion" class="block text-sm font-semibold text-gray-700 mb-1">
-          📄 Descripción Detallada
-        </label>
-        <textarea 
-          id="descripcion" 
-          v-model="incidente.descripcion" 
-          rows="4"
-          class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-          placeholder="Describe el problema con el mayor detalle posible..."
-          required 
-          minlength="10"></textarea>
-        <p v-if="errores.descripcion" class="text-xs text-red-600 mt-1">{{ errores.descripcion }}</p>
+        <label for="descripcion" class="block text-sm font-medium text-left text-gray-700 dark:text-gray-300">📄 Descripción Detallada</label>
+        <textarea v-model="incidente.descripcion" id="descripcion" rows="4" class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500" required></textarea>
+        <p v-if="errores.descripcion" class="mt-1 text-xs text-red-500">{{ errores.descripcion }}</p>
       </div>
-
-      <!-- Campo Prioridad -->
       <div>
-        <label for="prioridad" class="block text-sm font-semibold text-gray-700 mb-1">
-          ⚠️ Prioridad
-        </label>
-        <select 
-          id="prioridad" 
-          v-model="incidente.prioridad"
-          class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-          required>
-          <option disabled value="">Selecciona una prioridad</option>
+        <label for="prioridad" class="block text-sm font-medium text-left text-gray-700 dark:text-gray-300">⚠️ Prioridad</label>
+        <select v-model="incidente.prioridad" id="prioridad" class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+          <option value="" disabled>Selecciona una prioridad</option>
           <option value="Baja">Baja</option>
           <option value="Media">Media</option>
           <option value="Alta">Alta</option>
         </select>
-        <p v-if="errores.prioridad" class="text-xs text-red-600 mt-1">{{ errores.prioridad }}</p>
+        <p v-if="errores.prioridad" class="mt-1 text-xs text-red-500">{{ errores.prioridad }}</p>
       </div>
-
-      <!-- Botón de Envío -->
-      <div class="pt-4">
-        <button 
-          type="submit"
-          class="w-full bg-gray-800 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-700 transition-transform transform hover:scale-105 disabled:bg-gray-400"
-          :disabled="isSubmitting">
+      <div>
+        <button type="submit" :disabled="isSubmitting" class="w-full px-4 py-2 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400">
           {{ isSubmitting ? 'Enviando...' : 'Enviar Incidente' }}
         </button>
       </div>
+      <p v-if="mensaje" class="mt-2 text-sm text-center text-green-600 dark:text-green-400">{{ mensaje }}</p>
     </form>
-    
-    <!-- Mensaje de Éxito/Error Global -->
-    <p v-if="mensaje" class="mt-4 text-center text-sm" :class="esError ? 'text-red-600' : 'text-green-600'">
-      {{ mensaje }}
-    </p>
   </div>
 </template>
 
@@ -79,64 +42,65 @@
 import { ref, reactive } from 'vue';
 import apiClient from '../services/api';
 
-const incidente = ref({
+// 'defineEmits' le dice a Vue que este componente puede "emitir" un evento llamado 'incident-created'
+const emit = defineEmits(['incident-created']);
+
+const incidente = reactive({
+  titulo: '',
+  descripcion: '',
+  prioridad: 'Media', // Valor por defecto
+});
+
+const errores = reactive({
   titulo: '',
   descripcion: '',
   prioridad: '',
 });
 
-// Usamos un objeto reactivo para los errores, es más limpio
-const errores = reactive({
-  titulo: null,
-  descripcion: null,
-  prioridad: null,
-});
-
 const isSubmitting = ref(false);
 const mensaje = ref('');
-const esError = ref(false);
 
-const emit = defineEmits(['incidenteCreado']);
+const validateForm = () => {
+    let isValid = true;
+    errores.titulo = '';
+    errores.descripcion = '';
+    errores.prioridad = '';
 
-const validarFormulario = () => {
-  let esValido = true;
-  errores.titulo = !incidente.value.titulo ? 'El título es requerido.' : null;
-  errores.descripcion = !incidente.value.descripcion ? 'La descripción es requerida.' : null;
-  errores.prioridad = !incidente.value.prioridad ? 'La prioridad es requerida.' : null;
-  
-  if (errores.titulo || errores.descripcion || errores.prioridad) {
-    esValido = false;
-  }
-  return esValido;
-};
+    if (!incidente.titulo) {
+        errores.titulo = 'El título es requerido.';
+        isValid = false;
+    }
+    if (!incidente.descripcion) {
+        errores.descripcion = 'La descripción es requerida.';
+        isValid = false;
+    }
+    if (!incidente.prioridad) {
+        errores.prioridad = 'La prioridad es requerida.';
+        isValid = false;
+    }
+    return isValid;
+}
 
-const enviarIncidente = async () => {
-  if (!validarFormulario()) {
-    return;
-  }
+async function submitForm() {
+  if (!validateForm()) return;
 
   isSubmitting.value = true;
   mensaje.value = '';
-  esError.value = false;
 
   try {
-    const response = await apiClient.post('/incidentes/crear', incidente.value);
-    mensaje.value = `${response.data.mensaje}. Número de Incidente: ${response.data.numeroIncidente}`;
-    esError.value = false;
+    const response = await apiClient.post('/incidentes/crear', incidente);
     
-    // Limpiar formulario
-    incidente.value = { titulo: '', descripcion: '', prioridad: '' };
-    
-    // Notificar al componente padre que se creó el incidente
-    emit('incidenteCreado');
+    // Si la creación es exitosa, emitimos el evento con los datos del nuevo incidente
+    // El componente padre (Incidentes.vue) escuchará este evento.
+    emit('incident-created', response.data);
 
   } catch (error) {
-    mensaje.value = error.response?.data?.error || 'Ocurrió un error al enviar el incidente.';
-    esError.value = true;
+    mensaje.value = 'Error al crear el incidente. Inténtalo de nuevo.';
+    console.error(error);
   } finally {
     isSubmitting.value = false;
   }
-};
+}
 </script>
 
 <style scoped>

@@ -33,7 +33,7 @@ import {
 
   */
 const menu = [  
-  { label: 'Incidentes', icon: Bug, route: '/incidentes' },  
+  { label: 'Incidentes', icon: Bug, route: '/admin/incidentes' },  
   { label: 'Solicitudes de Servicio', icon: ClipboardList, route: '/admin/solicitudes' },  
   { label: 'Problemas', icon: AlertTriangle, route: '/problemas' },  
   { label: 'Gestión de Cambios', icon: GitPullRequest, route: '/admin/cambios' },  
