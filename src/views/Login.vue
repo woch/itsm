@@ -71,7 +71,7 @@ async function handleLogin() {
 
   try {
     // Llamada a la API del backend usando Axios
-    const response = await apiClient.post('/auth/login', {
+    const response = await apiClient.post('http://localhost:5001/api/auth/login', {
       usuario: usuario.value,
       contrasena: contrasena.value
     });

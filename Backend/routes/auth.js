@@ -1,5 +1,3 @@
-// Backend/routes/auth.js (Versión corregida para autenticar por 'usuario')
-
 const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");

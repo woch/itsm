@@ -1,6 +1,6 @@
 <template>
   <div class="contenedor">
-    <h2>Base de Conocimiento</h2>
+    <h2 class="text-2xl font-bold">Base de Conocimiento</h2>
     <p class="subtitulo">Consulta artículos, tutoriales y guías del sistema</p>
 
     <!-- Botón de regreso -->
@@ -8,11 +8,44 @@
       <button @click="volverMenu">⬅ Volver al menú principal</button>
     </div>
 
-    <!-- Artículos simulados -->
+    <!-- Lista de artículos -->
     <div class="articulos">
-      <div v-for="(articulo, index) in articulos" :key="index" class="tarjeta">
+      <div
+        v-for="(articulo, index) in articulos"
+        :key="index"
+        class="tarjeta cursor-pointer hover:shadow-md transition"
+        @click="abrirModal(articulo)"
+      >
         <h3>{{ articulo.titulo }}</h3>
         <p>{{ articulo.descripcion }}</p>
+      </div>
+    </div>
+
+    <!-- Modal de detalle -->
+    <div v-if="modalAbierto" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white p-6 rounded-md shadow-md w-full max-w-lg relative">
+        <button class="absolute top-2 right-2 text-gray-500 hover:text-black" @click="cerrarModal">✖</button>
+        <h3 class="text-xl font-bold mb-2">{{ seleccionado.titulo }}</h3>
+        <p class="text-gray-700 mb-4">{{ seleccionado.descripcion }}</p>
+
+        <div class="flex flex-wrap gap-3">
+          <a
+            v-if="seleccionado.enlaceVideo"
+            :href="seleccionado.enlaceVideo"
+            target="_blank"
+            class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          >
+            Ver video
+          </a>
+          <a
+            v-if="seleccionado.documentoPDF"
+            :href="seleccionado.documentoPDF"
+            target="_blank"
+            class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Ver PDF
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -20,32 +53,45 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
 const router = useRouter()
 
 const volverMenu = () => {
-  router.push('/') // Ajusta si tu ruta principal es diferente
+  router.push('/')
 }
 
-const articulos = [
-  {
-    titulo: 'Cómo reportar un incidente',
-    descripcion: 'Sigue estos pasos para registrar un problema técnico en la plataforma ITSM.'
-  },
-  {
-    titulo: 'Solicitar nuevo equipo',
-    descripcion: 'Guía paso a paso para ingresar una solicitud de teclado, monitor, etc.'
-  },
-  {
-    titulo: 'Recuperar acceso a sistemas',
-    descripcion: '¿Perdiste tu acceso? Aquí te mostramos cómo recuperar tu cuenta.'
+const articulos = ref([])
+const modalAbierto = ref(false)
+const seleccionado = ref({})
+
+// Obtener desde backend
+const obtenerArticulos = async () => {
+  try {
+    const res = await axios.get('http://localhost:5001/api/conocimiento')
+    articulos.value = res.data.resultados || res.data // según cómo devuelva tu backend
+  } catch (err) {
+    console.error('Error al obtener artículos:', err.message)
   }
-]
+}
+
+const abrirModal = (articulo) => {
+  seleccionado.value = articulo
+  modalAbierto.value = true
+}
+
+const cerrarModal = () => {
+  modalAbierto.value = false
+  seleccionado.value = {}
+}
+
+onMounted(obtenerArticulos)
 </script>
 
 <style scoped>
 .contenedor {
-  max-width: 700px;
+  max-width: 800px;
   margin: auto;
   background-color: #f8fafc;
   padding: 2rem;

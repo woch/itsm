@@ -26,16 +26,19 @@ import {
   BarChart,  
   Users  
 } from 'lucide-vue-next'  
-  
+  /*
+
+    { label: 'Gestión de Niveles de Servicio', icon: TrendingUp, route: '/niveles-servicio' },  
+  { label: 'Reportes', icon: BarChart, route: '/reportes' },  
+
+  */
 const menu = [  
   { label: 'Incidentes', icon: Bug, route: '/incidentes' },  
-  { label: 'Solicitudes de Servicio', icon: ClipboardList, route: '/solicitudes' },  
+  { label: 'Solicitudes de Servicio', icon: ClipboardList, route: '/admin/solicitudes' },  
   { label: 'Problemas', icon: AlertTriangle, route: '/problemas' },  
-  { label: 'Gestión de Cambios', icon: GitPullRequest, route: '/cambios' },  
+  { label: 'Gestión de Cambios', icon: GitPullRequest, route: '/admin/cambios' },  
   { label: 'Base de Conocimiento', icon: BookOpen, route: '/admin/conocimiento' },  
   { label: 'Gestión de Activos IT', icon: Server, route: '/activos' },  
-  { label: 'Gestión de Niveles de Servicio', icon: TrendingUp, route: '/niveles-servicio' },  
-  { label: 'Reportes', icon: BarChart, route: '/reportes' },  
   { label: 'Usuarios', icon: Users, route: '/admin/usuarios' }  
 ]  
 </script>
