@@ -1,37 +1,45 @@
 <template>
-  <header class="bg-blue-600 text-white p-4 shadow">
-    <div class="container mx-auto flex justify-between items-center">
-      <h1 class="text-2xl font-bold">Plataforma ITSM - Retail</h1>
-      <nav class="space-x-4">
-        <RouterLink v-if="isLoggedIn"  to="/dashboard" class="hover:underline text-white-300">Administración</RouterLink>
+  <header class="w-full bg-blue-600 text-white shadow-md">
+    <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+      <!-- Título de la Plataforma -->
+      <router-link to="/" class="text-xl font-bold hover:text-blue-200 transition-colors">
+        Plataforma ITSM - Retail
+      </router-link>
+
+      <!-- Botones de Navegación y Sesión -->
+      <div class="flex items-center space-x-4">
         
+        <!-- Botón de Administración: se muestra SÓLO si el usuario es admin -->
+        <router-link
+          v-if="isAdmin"
+          to="/admin/incidentes"
+          class="px-4 py-2 text-sm font-medium bg-white text-blue-600 rounded-md hover:bg-gray-200 transition-colors"
+        >
+          Administración
+        </router-link>
+
+        <!-- Botón de Cerrar Sesión: se muestra si el usuario está autenticado -->
         <button
-          v-if="isLoggedIn"
-          @click="logout"
-          class="hover:underline text-red-300"
+          v-if="isAuthenticated"
+          @click="handleLogout"
+          class="px-4 py-2 text-sm font-medium bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
         >
           Cerrar sesión
         </button>
-      </nav>
-    </div>
+      </div>
+    </nav>
   </header>
 </template>
 
 <script setup>
-import { ref, watchEffect } from 'vue'
-import { useRouter } from 'vue-router'
+import { useAuth } from '../composables/useAuth';
 
-const router = useRouter()
-const isLoggedIn = ref(false)
+// Usamos nuestro composable para obtener el estado y las funciones
+const { isAuthenticated, isAdmin, logout } = useAuth();
 
-// Observar el estado de localStorage
-watchEffect(() => {
-  isLoggedIn.value = localStorage.getItem('isAuthenticated') === 'true'
-})
-
-function logout() {
-  localStorage.removeItem('isAuthenticated')
-  isLoggedIn.value = false
-  router.push('/login')
-}
+const handleLogout = () => {
+  // Simplemente llamamos a la función logout de nuestro helper
+  logout();
+};
 </script>
+
