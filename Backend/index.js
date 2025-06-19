@@ -11,7 +11,7 @@ const conocimientoRoutes = require("./routes/conocimiento");
 const usuariosRoutes = require("./routes/usuarios"); // Asegúrate de que esta línea esté presente
 const solicitudRoutes = require("./routes/solicitudes");
 const cambiosRoutes = require('./routes/cambios')
-
+const authRoutes = require("./routes/auth"); // <-- Ahora sí existe este archivo
 
 // const authRoutes = require("./routes/auth"); // La dejaremos comentada por ahora
 
@@ -29,7 +29,7 @@ app.use("/api/usuarios", usuariosRoutes); // Y que esta línea también
 app.use('/api/solicitudes', solicitudRoutes)
 app.use('/api/cambios', cambiosRoutes)
 
-// app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes); // 
 
 const PORT = process.env.PORT || 3001;
 
@@ -38,3 +38,6 @@ conectarDB().then(() => {
     console.log(`🚀 Backend unificado corriendo en http://localhost:${PORT}`);
   });
 });
+
+
+
