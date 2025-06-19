@@ -17,6 +17,7 @@ router.get('/', async (req, res) => {
 // POST /api/usuarios - Crear un nuevo usuario
 router.post('/', async (req, res) => {
     // Usamos los campos del modelo corregido
+    console.log(req.body);
     const { usuario, contrasena, rol, nombre, apellido, departamento } = req.body;
 
     if (!usuario || !contrasena || !rol || !nombre || !apellido) {

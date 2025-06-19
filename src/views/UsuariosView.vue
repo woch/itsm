@@ -56,7 +56,7 @@
                             required />
                         <input v-model="form.correo" placeholder="Correo" class="p-2 border rounded col-span-2" required
                             type="email" />
-                        <input v-model="form.contraseña" placeholder="Contraseña" class="p-2 border rounded col-span-2"
+                        <input v-model="form.contrasena" placeholder="Contraseña" class="p-2 border rounded col-span-2"
                             :required="!usuarioEditando" type="password" />
                         <select v-model="form.rol" class="p-2 border rounded col-span-1" required>
                             <option disabled value="">Rol</option>

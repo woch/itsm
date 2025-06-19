@@ -1,15 +1,18 @@
-// Backend/models/Activo.js
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
-const ActivoSchema = new mongoose.Schema({
+const activoSchema = new mongoose.Schema({
   nombre: { type: String, required: true },
-  tipo: { type: String, required: true },
-  marca: String,
-  modelo: String,
+  tipo: { type: String, required: true }, // Ej: Computadora, Impresora, POS, etc.
+  descripcion: { type: String },
   numeroSerie: { type: String, unique: true },
-  descripcion: String,
-  departamentoAsignado: String,
-  valor: Number
-});
+  estado: {
+    type: String,
+    enum: ['En uso', 'Disponible', 'En reparación', 'Retirado'],
+    default: 'Disponible'
+  },
+  ubicacion: { type: String },
+  responsable: { type: String },
+  fechaRegistro: { type: Date, default: Date.now }
+})
 
-module.exports = mongoose.model('Activo', ActivoSchema);
+module.exports = mongoose.model('Activo', activoSchema)
