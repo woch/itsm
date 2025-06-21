@@ -8,19 +8,40 @@
       Reporta y da seguimiento a problemas de IT.
     </p>
     <form @submit.prevent="submitForm" class="space-y-4">
+
+      <!-- Campo oculto para ID -->
+      <input type="hidden" v-model="incidente.usuarioId" />
+
+      <!-- Campo de nombre solo lectura -->
       <div>
-        <label for="titulo" class="block text-sm font-medium text-left text-gray-700 dark:text-gray-300">📝 Título del Incidente</label>
-        <input v-model="incidente.titulo" type="text" id="titulo" class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+        <label class="block text-sm font-medium text-left text-gray-700 dark:text-gray-300">👤 Usuario</label>
+        <input type="text" :value="incidente.usuarioNombre" disabled
+          class="w-full px-3 py-2 mt-1 border border-gray-300 bg-gray-100 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white cursor-not-allowed" />
+      </div>
+
+
+      <div>
+        <label for="titulo" class="block text-sm font-medium text-left text-gray-700 dark:text-gray-300">📝 Título del
+          Incidente</label>
+        <input v-model="incidente.titulo" type="text" id="titulo"
+          class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          required>
         <p v-if="errores.titulo" class="mt-1 text-xs text-red-500">{{ errores.titulo }}</p>
       </div>
       <div>
-        <label for="descripcion" class="block text-sm font-medium text-left text-gray-700 dark:text-gray-300">📄 Descripción Detallada</label>
-        <textarea v-model="incidente.descripcion" id="descripcion" rows="4" class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500" required></textarea>
+        <label for="descripcion" class="block text-sm font-medium text-left text-gray-700 dark:text-gray-300">📄
+          Descripción Detallada</label>
+        <textarea v-model="incidente.descripcion" id="descripcion" rows="4"
+          class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          required></textarea>
         <p v-if="errores.descripcion" class="mt-1 text-xs text-red-500">{{ errores.descripcion }}</p>
       </div>
       <div>
-        <label for="prioridad" class="block text-sm font-medium text-left text-gray-700 dark:text-gray-300">⚠️ Prioridad</label>
-        <select v-model="incidente.prioridad" id="prioridad" class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+        <label for="prioridad" class="block text-sm font-medium text-left text-gray-700 dark:text-gray-300">⚠️
+          Prioridad</label>
+        <select v-model="incidente.prioridad" id="prioridad"
+          class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+          required>
           <option value="" disabled>Selecciona una prioridad</option>
           <option value="Baja">Baja</option>
           <option value="Media">Media</option>
@@ -29,7 +50,8 @@
         <p v-if="errores.prioridad" class="mt-1 text-xs text-red-500">{{ errores.prioridad }}</p>
       </div>
       <div>
-        <button type="submit" :disabled="isSubmitting" class="w-full px-4 py-2 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400">
+        <button type="submit" :disabled="isSubmitting"
+          class="w-full px-4 py-2 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-400">
           {{ isSubmitting ? 'Enviando...' : 'Enviar Incidente' }}
         </button>
       </div>
@@ -41,6 +63,7 @@
 <script setup>
 import { ref, reactive } from 'vue';
 import apiClient from '../services/api';
+import { onMounted } from 'vue'
 
 // 'defineEmits' le dice a Vue que este componente puede "emitir" un evento llamado 'incident-created'
 const emit = defineEmits(['incident-created']);
@@ -57,28 +80,44 @@ const errores = reactive({
   prioridad: '',
 });
 
+
+
+onMounted(() => {
+  const userData = localStorage.getItem('user')
+  if (userData) {
+    try {
+      const user = JSON.parse(userData)
+      incidente.usuarioId = user.id
+      incidente.usuarioNombre = `${user.nombre} ${user.apellido}`
+    } catch (e) {
+      console.error('Error al parsear el usuario:', e)
+    }
+  }
+})
+
+
 const isSubmitting = ref(false);
 const mensaje = ref('');
 
 const validateForm = () => {
-    let isValid = true;
-    errores.titulo = '';
-    errores.descripcion = '';
-    errores.prioridad = '';
+  let isValid = true;
+  errores.titulo = '';
+  errores.descripcion = '';
+  errores.prioridad = '';
 
-    if (!incidente.titulo) {
-        errores.titulo = 'El título es requerido.';
-        isValid = false;
-    }
-    if (!incidente.descripcion) {
-        errores.descripcion = 'La descripción es requerida.';
-        isValid = false;
-    }
-    if (!incidente.prioridad) {
-        errores.prioridad = 'La prioridad es requerida.';
-        isValid = false;
-    }
-    return isValid;
+  if (!incidente.titulo) {
+    errores.titulo = 'El título es requerido.';
+    isValid = false;
+  }
+  if (!incidente.descripcion) {
+    errores.descripcion = 'La descripción es requerida.';
+    isValid = false;
+  }
+  if (!incidente.prioridad) {
+    errores.prioridad = 'La prioridad es requerida.';
+    isValid = false;
+  }
+  return isValid;
 }
 
 async function submitForm() {
@@ -89,7 +128,7 @@ async function submitForm() {
 
   try {
     const response = await apiClient.post('/incidentes/crear', incidente);
-    
+
     // Si la creación es exitosa, emitimos el evento con los datos del nuevo incidente
     // El componente padre (Incidentes.vue) escuchará este evento.
     emit('incident-created', response.data);
@@ -154,7 +193,8 @@ textarea {
   align-items: center;
   gap: 0.4rem;
   font-weight: 500;
-  color: #111827; /* letras siempre negras */
+  color: #111827;
+  /* letras siempre negras */
 }
 
 .acciones {
@@ -175,6 +215,7 @@ textarea {
 .boton.baja {
   background-color: #3b82f6;
 }
+
 .boton.baja:hover {
   background-color: #2563eb;
 }
@@ -182,6 +223,7 @@ textarea {
 .boton.media {
   background-color: #f59e0b;
 }
+
 .boton.media:hover {
   background-color: #d97706;
 }
@@ -189,6 +231,7 @@ textarea {
 .boton.alta {
   background-color: #ef4444;
 }
+
 .boton.alta:hover {
   background-color: #dc2626;
 }

@@ -83,6 +83,8 @@ async function handleLogin() {
     // 2. Guardamos la información del usuario también para usarla en la UI.
     localStorage.setItem('user', JSON.stringify(response.data.usuario));
 
+    console.log('Login exitoso:', response.data);
+
     // 3. Este es el 'flag' que tu router actual usa para saber si estás autenticado.
     localStorage.setItem('isAuthenticated', 'true');
     

@@ -6,6 +6,7 @@ const Problema = require('../models/Problema');
 
 // Crear un nuevo incidente
 router.post("/crear", async (req, res) => {
+  console.log("Datos recibidos para crear un incidente:", req.body);
   try {
     const nuevoIncidente = new Incidente(req.body);
     await nuevoIncidente.save(); // El middleware 'pre' se encargará del autoincremento
@@ -35,6 +36,16 @@ router.get("/", async (req, res) => {
     res.status(200).json(incidentes);
   } catch (err) {
     res.status(500).json({ error: "Error al obtener los incidentes" });
+  }
+});
+
+// Listar todos los incidentes de un usuario
+router.get("/usuario/:usuarioId", async (req, res) => {
+  try {
+    const incidentes = await Incidente.find({ usuarioId: req.params.usuarioId }).sort({ fechaCreacion: -1 });
+    res.status(200).json(incidentes);
+  } catch (err) {
+    res.status(500).json({ error: "Error al obtener los incidentes del usuario", detalle: err.message });
   }
 });
 

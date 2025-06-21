@@ -9,6 +9,11 @@ const IncidenteSchema = new mongoose.Schema({
   prioridad: { type: String, required: true, enum: ['Baja', 'Media', 'Alta'] },
   estado: { type: String, default: 'Abierto' },
   fechaCreacion: { type: Date, default: Date.now },
+
+  // Nuevos campos de usuario
+  usuarioId: { type: mongoose.Schema.Types.ObjectId, ref: 'Usuario', required: true },
+  usuarioNombre: { type: String, required: true },
+
   historial: [{
     autor: String,
     texto: String,
