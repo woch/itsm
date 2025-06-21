@@ -35,7 +35,7 @@ import {
 const menu = [  
   { label: 'Incidentes', icon: Bug, route: '/admin/incidentes' },  
   { label: 'Solicitudes de Servicio', icon: ClipboardList, route: '/admin/solicitudes' },  
-  { label: 'Problemas', icon: AlertTriangle, route: '/problemas' },  
+  { label: 'Problemas', icon: AlertTriangle, route: '/admin/problemas' },  
   { label: 'Gestión de Cambios', icon: GitPullRequest, route: '/admin/cambios' },  
   { label: 'Base de Conocimiento', icon: BookOpen, route: '/admin/conocimiento' },  
   { label: 'Gestión de Activos IT', icon: Server, route: '/activos' },  

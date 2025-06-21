@@ -16,10 +16,14 @@ const IncidenteSchema = new mongoose.Schema({
 
   historial: [{
     autor: String,
+    idautor: String,
     texto: String,
     fecha: { type: Date, default: Date.now }
   }]
 });
+
+
+
 
 // Middleware para autoincrementar 'numeroIncidente' antes de guardar
 IncidenteSchema.pre('save', async function(next) {

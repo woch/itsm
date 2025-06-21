@@ -49,16 +49,7 @@ router.get("/usuario/:usuarioId", async (req, res) => {
   }
 });
 
-// Obtener un solo incidente
-router.get("/:id", async (req, res) => {
-  try {
-    const incidente = await Incidente.findById(req.params.id);
-    if (!incidente) return res.status(404).json({ error: "Incidente no encontrado." });
-    res.status(200).json(incidente);
-  } catch (err) {
-    res.status(500).json({ error: "Error al obtener el incidente." });
-  }
-});
+
 
 // Actualizar un incidente
 router.put("/:id", async (req, res) => {
@@ -117,5 +108,45 @@ router.post("/:id/convertir", async (req, res) => {
         res.status(500).json({ error: "Error interno al convertir el incidente.", detalle: err.message });
     }
 });
+
+
+// ✅ Poner rutas específicas antes que las dinámicas
+router.get("/resumen-estados", async (req, res) => {
+  try {
+    const resumen = await Incidente.aggregate([
+      {
+        $group: {
+          _id: "$estado",
+          total: { $sum: 1 }
+        }
+      }
+    ]);
+
+    const estados = ['Abierto', 'En proceso', 'Resuelto', 'Cerrado'];
+    const data = estados.reduce((acc, estado) => {
+      const encontrado = resumen.find(e => e._id === estado);
+      acc[estado] = encontrado ? encontrado.total : 0;
+      return acc;
+    }, {});
+
+    res.status(200).json(data);
+  } catch (err) {
+    console.error('Error al obtener resumen:', err);
+    res.status(500).json({ error: "No se pudo obtener el resumen de estados." });
+  }
+});
+
+// 🔽 Esta ruta debe ir al final de las rutas GET
+router.get("/:id", async (req, res) => {
+  try {
+    const incidente = await Incidente.findById(req.params.id);
+    if (!incidente) return res.status(404).json({ error: "Incidente no encontrado." });
+    res.status(200).json(incidente);
+  } catch (err) {
+    res.status(500).json({ error: "Error al obtener el incidente...." });
+  }
+});
+
+
 
 module.exports = router;

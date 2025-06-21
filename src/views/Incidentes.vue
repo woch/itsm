@@ -72,41 +72,69 @@
   </div>
 
   <!-- Modal -->
-  <div v-if="modalVisible" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg max-w-lg w-full p-6 relative">
+  <div v-if="modalVisible"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+    <div
+      class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-2xl w-full p-6 relative border border-gray-200 dark:border-gray-700 transition-transform transform-gpu">
+      <!-- Botón cerrar -->
       <button @click="cerrarModal"
-        class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white font-bold text-xl"
+        class="absolute top-4 right-4 text-gray-500 hover:text-red-600 dark:hover:text-red-400 text-2xl font-bold"
         aria-label="Cerrar modal">
         &times;
       </button>
 
-      <h3 class="text-2xl font-semibold mb-4 text-gray-900 dark:text-white">
+      <!-- Título -->
+      <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
         #{{ incidenteSeleccionado.numeroIncidente }} - {{ incidenteSeleccionado.titulo }}
       </h3>
 
-      <p class="mb-2 text-gray-700 dark:text-gray-300"><strong>Descripción:</strong> {{
-        incidenteSeleccionado.descripcion }}</p>
+      <!-- Detalles del incidente -->
+      <div class="space-y-3 mt-4 text-gray-700 dark:text-gray-300">
+        <p><strong class="text-gray-800 dark:text-gray-100">Descripción:</strong> {{ incidenteSeleccionado.descripcion
+          }}</p>
 
-      <p class="mb-2 text-gray-700 dark:text-gray-300"><strong>Prioridad:</strong> {{ incidenteSeleccionado.prioridad }}
-      </p>
+        <p>
+          <strong class="text-gray-800 dark:text-gray-100">Prioridad:</strong>
+          <span :class="{
+            'bg-green-100 text-green-800': incidenteSeleccionado.prioridad === 'Baja',
+            'bg-yellow-100 text-yellow-800': incidenteSeleccionado.prioridad === 'Media',
+            'bg-red-100 text-red-800': incidenteSeleccionado.prioridad === 'Alta'
+          }" class="inline-block px-2 py-0.5 rounded text-sm font-medium">
+            {{ incidenteSeleccionado.prioridad }}
+          </span>
+        </p>
 
-      <p class="mb-2 text-gray-700 dark:text-gray-300"><strong>Estado:</strong> {{ incidenteSeleccionado.estado }}</p>
+        <p>
+          <strong class="text-gray-800 dark:text-gray-100">Estado:</strong>
+          <span class="inline-block bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-sm font-medium">
+            {{ incidenteSeleccionado.estado }}
+          </span>
+        </p>
 
-      <p class="mb-2 text-gray-700 dark:text-gray-300"><strong>Fecha de creación:</strong> {{ new
-        Date(incidenteSeleccionado.fechaCreacion).toLocaleString() }}</p>
+        <p><strong class="text-gray-800 dark:text-gray-100">Fecha de creación:</strong> {{ new
+          Date(incidenteSeleccionado.fechaCreacion).toLocaleString() }}</p>
+      </div>
 
-      <!-- Historial, si quieres mostrarlo -->
-      <div v-if="incidenteSeleccionado.historial && incidenteSeleccionado.historial.length > 0" class="mt-4">
-        <h4 class="font-semibold mb-2 text-gray-900 dark:text-white">Historial</h4>
-        <ul class="max-h-48 overflow-y-auto text-gray-700 dark:text-gray-300 text-sm space-y-1">
-          <li v-for="(item, index) in incidenteSeleccionado.historial" :key="index">
-            <span class="font-semibold">{{ item.autor }}:</span> {{ item.texto }} <em>({{ new
-              Date(item.fecha).toLocaleString() }})</em>
-          </li>
-        </ul>
+      <!-- Historial -->
+      <div v-if="incidenteSeleccionado.historial?.length" class="mt-6">
+        <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">🕒 Historial de Respuestas</h4>
+        <div class="max-h-56 overflow-y-auto pr-2">
+          <ul class="space-y-3 text-sm">
+            <li v-for="(item, index) in incidenteSeleccionado.historial" :key="index"
+              class="p-3 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600">
+              <p class="mb-1"><strong>{{ item.autor }}</strong> <span class="text-xs text-gray-500">({{ new
+                Date(item.fecha).toLocaleString() }})</span></p>
+              <p>{{ item.texto }}</p>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- Fin del modal -->
+
+
 
 
 </template>

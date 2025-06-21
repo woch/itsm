@@ -1,85 +1,96 @@
-<!-- frontend/src/views/AdminIncidentes.vue (NUEVO ARCHIVO) -->
 <template>
-  <div class="p-6 bg-gray-50 min-h-screen">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">Gestión de Incidentes (Admin)</h1>
-      <button @click="mostrarFormulario = !mostrarFormulario"
-        class="bg-gray-800 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-900 transition-colors">
-        {{ mostrarFormulario ? 'Ver Listado' : 'Nuevo Incidente' }}
-      </button>
-    </div>
+  <div class="flex">
+    <Sidebar />
+    <main class="flex-1 p-6 bg-gray-100 min-h-screen">
+  
+        <div class="flex justify-between items-center mb-6">
+          <h1 class="text-3xl font-bold text-gray-800">Gestión de Incidentes (Admin)</h1>
+          <button @click="mostrarFormulario = !mostrarFormulario"
+            class="bg-gray-800 text-white font-bold py-2 px-4 rounded-lg hover:bg-gray-900 transition-colors">
+            {{ mostrarFormulario ? 'Ver Listado' : 'Nuevo Incidente' }}
+          </button>
+        </div>
 
-    <!-- El formulario se muestra/oculta aquí -->
-    <div v-if="mostrarFormulario" class="mb-8">
-      <!-- Usamos un componente diferente para el formulario de admin si es necesario, o el mismo -->
-      <IncidentCard @incident-created="handleIncidenteCreado" />
-    </div>
+        <!-- El formulario se muestra/oculta aquí -->
+        <div v-if="mostrarFormulario" class="mb-8">
+          <!-- Usamos un componente diferente para el formulario de admin si es necesario, o el mismo -->
+          <IncidentCard @incident-created="handleIncidenteCreado" />
+        </div>
 
-    <!-- La tabla se muestra si el formulario está oculto -->
-    <div v-else>
-      <div class="mb-4">
-        <input 
-          type="text" 
-          v-model="terminoBusqueda"
-          @input="buscarIncidentes"
-          placeholder="Buscar por Número de Ticket, título o descripción..."
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+        <!-- La tabla se muestra si el formulario está oculto -->
+        <div v-else>
+          <div class="mb-4">
+            <input type="text" v-model="terminoBusqueda" @input="buscarIncidentes"
+              placeholder="Buscar por Número de Ticket, título o descripción..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+          </div>
 
-      <div v-if="cargando" class="text-center py-10">Cargando incidentes...</div>
-      <div v-else-if="error" class="text-center text-red-500 py-10">{{ error }}</div>
-      
-      <div v-else-if="incidentes.length === 0" class="text-center text-gray-500 py-10 bg-white rounded-lg shadow">
-        No hay incidentes que coincidan con la búsqueda.
-      </div>
+          <div v-if="cargando" class="text-center py-10">Cargando incidentes...</div>
+          <div v-else-if="error" class="text-center text-red-500 py-10">{{ error }}</div>
 
-      <div v-else class="bg-white shadow-lg rounded-lg overflow-x-auto">
-        <table class="min-w-full">
-          <thead>
-            <tr class="bg-gray-200">
-              <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">N°</th>
-              <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Título</th> 
-              <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Prioridad</th>
-              <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Estado</th>
-              <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Fecha Creación</th>
-              <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Acciones</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr v-for="incidente in incidentes" :key="incidente._id" class="hover:bg-gray-100 transition-colors duration-150">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center text-gray-800">{{ incidente.numeroIncidente }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-left text-gray-600">{{ incidente.titulo }}</td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <select v-model="incidente.prioridad" @change="actualizarIncidente(incidente._id, { prioridad: $event.target.value })" 
-                  :class="getPrioridadClass(incidente.prioridad)"
-                  class="w-full text-xs font-semibold text-center rounded-full px-3 py-1 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                  <option value="Baja">Baja</option>
-                  <option value="Media">Media</option>
-                  <option value="Alta">Alta</option>
-                </select>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <select v-model="incidente.estado" @change="actualizarIncidente(incidente._id, { estado: $event.target.value })" 
-                  class="w-full p-2 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer text-center">
-                  <option value="Abierto">Abierto</option>
-                  <option value="En Progreso">En Progreso</option>
-                  <option value="Resuelto">Resuelto</option>
-                  <option value="Cerrado">Cerrado</option>
-                </select>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ new Date(incidente.fechaCreacion).toLocaleDateString() }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                <router-link :to="{ name: 'DetalleIncidente', params: { id: incidente._id } }"
-                  class="bg-blue-100 text-blue-800 text-xs font-semibold py-1 px-4 rounded-full hover:bg-blue-200 transition-colors">
-                  Ver Detalles
-                </router-link>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+          <div v-else-if="incidentes.length === 0" class="text-center text-gray-500 py-10 bg-white rounded-lg shadow">
+            No hay incidentes que coincidan con la búsqueda.
+          </div>
+
+          <div v-else class="bg-white shadow-lg rounded-lg overflow-x-auto">
+            <table class="min-w-full">
+              <thead>
+                <tr class="bg-gray-200">
+                  <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">N°</th>
+                  <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Título</th>
+                  <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Prioridad
+                  </th>
+                  <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Creador
+                  </th>
+                  <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Estado</th>
+                  <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Fecha
+                    Creación</th>
+                  <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <tr v-for="incidente in incidentes" :key="incidente._id"
+                  class="hover:bg-gray-100 transition-colors duration-150">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center text-gray-800">{{
+                    incidente.numeroIncidente }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-left text-gray-600">{{ incidente.titulo }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <select v-model="incidente.prioridad"
+                      @change="actualizarIncidente(incidente._id, { prioridad: $event.target.value })"
+                      :class="getPrioridadClass(incidente.prioridad)"
+                      class="w-full text-xs font-semibold text-center rounded-full px-3 py-1 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                      <option value="Baja">Baja</option>
+                      <option value="Media">Media</option>
+                      <option value="Alta">Alta</option>
+                    </select>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-left text-gray-600">{{ incidente.usuarioNombre }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <select v-model="incidente.estado"
+                      @change="actualizarIncidente(incidente._id, { estado: $event.target.value })"
+                      class="w-full p-2 border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 cursor-pointer text-center">
+                      <option value="Abierto">Abierto</option>
+                      <option value="En Progreso">En Progreso</option>
+                      <option value="Resuelto">Resuelto</option>
+                      <option value="Cerrado">Cerrado</option>
+                    </select>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{{ new
+                    Date(incidente.fechaCreacion).toLocaleDateString() }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                    <router-link :to="{ name: 'DetalleIncidente', params: { id: incidente._id } }"
+                      class="bg-blue-100 text-blue-800 text-xs font-semibold py-1 px-4 rounded-full hover:bg-blue-200 transition-colors">
+                      Ver Detalles
+                    </router-link>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+    </main>
   </div>
 </template>
 
@@ -87,6 +98,7 @@
 import { ref, onMounted } from 'vue';
 import apiClient from '../services/api';
 import IncidentCard from '../components/IncidentCard.vue'; // Asegúrate que esta ruta sea correcta
+import Sidebar from '../components/Sidebar.vue'
 
 const incidentes = ref([]);
 const cargando = ref(true);
@@ -110,10 +122,10 @@ const fetchIncidentes = async () => {
 
 let searchTimeout;
 const buscarIncidentes = () => {
-    clearTimeout(searchTimeout);
-    searchTimeout = setTimeout(() => {
-        fetchIncidentes();
-    }, 300);
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    fetchIncidentes();
+  }, 300);
 }
 
 // Cuando se crea un incidente desde el formulario de admin, se oculta el formulario y se recarga la lista

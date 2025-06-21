@@ -139,13 +139,25 @@ const enviarRespuesta = async () => {
 
   enviandoRespuesta.value = true;
   const incidenteId = route.params.id;
-  
+  const userData = localStorage.getItem('user')
   try {
+    let autor = 'Equipo de Soporte'; // Valor por defecto
+    let idautor = null;
+
+    try {
+      const user = JSON.parse(userData)
+      idautor = user.id
+      autor = `${user.nombre} ${user.apellido}`
+    } catch (e) {
+      console.error('Error al parsear el usuario:', e)
+    }
+
+
     const response = await apiClient.post(`/incidentes/${incidenteId}/respuesta`, {
       texto: nuevaRespuestaTexto.value,
       // En una app real, el autor vendría del usuario logueado.
       // Por ahora, lo pondremos fijo.
-      autor: 'Equipo de Soporte' 
+      autor: autor 
     });
 
     // Añadimos la nueva respuesta al historial local para una actualización instantánea

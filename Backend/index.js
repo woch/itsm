@@ -7,6 +7,7 @@ const { conectarDB } = require("./db");
 
 // Importar rutas
 const incidentesRoutes = require("./routes/incidentes");
+const problemasRoutes = require("./routes/problemas");
 const activosRoutes = require('./routes/activos')
 const conocimientoRoutes = require("./routes/conocimiento");
 const usuariosRoutes = require("./routes/usuarios"); // Asegúrate de que esta línea esté presente
@@ -24,6 +25,7 @@ app.use(express.json());
 
 // Rutas de la API
 app.use("/api/incidentes", incidentesRoutes);
+app.use("/api/problemas", problemasRoutes);
 app.use('/api/activos', activosRoutes)
 app.use("/api/conocimiento", conocimientoRoutes);
 app.use("/api/usuarios", usuariosRoutes); // Y que esta línea también

@@ -13,12 +13,14 @@ import UsuariosVIew from '../views/UsuariosView.vue' // Importar la vista de Usu
 import SolicitudesView from '../views/SolicitudesView.vue'
 import GestionCambiosView from '../views/GestionCambiosView.vue'
 import AdminIncidentes from '../views/AdminIncidentes.vue'
+import AdminProblemas from '../views/AdminProblemas.vue'
 
 
 const routes = [
   { path: '/', name: 'Home', component: Home, meta: { requiresAuth: true } },
   { path: '/incidentes', component: Incidentes, meta: { requiresAuth: true } },
   { path: '/admin/incidentes', name: 'AdminIncidentes', component: AdminIncidentes, meta: { requiresAuth: true } },
+  { path: '/admin/problemas', name: 'AdminProblemas', component: AdminProblemas, meta: { requiresAuth: true } },
   { path: '/incidentes/:id', name: 'DetalleIncidente', component: DetalleIncidente, meta: { requiresAuth: true } },
   { path: '/solicitudes', component: Solicitudes, meta: { requiresAuth: true } },
   { path: '/admin/solicitudes', component: SolicitudesView, meta: { requiresAuth: true } },
